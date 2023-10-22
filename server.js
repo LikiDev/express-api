@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const employees = require('./data/employees.json');
+const mongoose = require('mongoose');
+const Post = require('./models/post'); 
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 // 1. GET /api/employees devuelve todos los empleados
 app.get('/api/employees', (req, res) => {
@@ -71,6 +73,64 @@ app.get('/api/employees/:name', (req, res) => {
         return res.status(404).json({ "code": "not_found" });
     }
     return res.json(employee);
+});
+
+
+//ENTREGA 2
+
+
+// POST /api/posts
+app.post('/api/posts', async (req, res) => {
+    try {
+        const post = new Post(req.body);
+        await post.save();
+        res.status(201).json(post);
+    } catch (error) {
+        res.status(400).json({ message: 'Error en la validación' });
+    }
+});
+
+// GET /api/posts
+app.get('/api/posts', async (req, res) => {
+    try {
+        const posts = await Post.find();
+        res.status(200).json(posts);
+    } catch (error) {
+        res.status(500).json({ message: 'Error interno del servidor' });
+    }
+});
+
+// GET /api/posts/:id
+app.get('/api/posts/:id', async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ message: 'Post no encontrado' });
+        res.status(200).json(post);
+    } catch (error) {
+        res.status(500).json({ message: 'Error interno del servidor' });
+    }
+});
+
+// PATCH /api/posts/:id
+app.patch('/api/posts/:id', async (req, res) => {
+    try {
+        const post = await Post.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!post) return res.status(404).json({ message: 'Post no encontrado' });
+        res.status(200).json(post);
+    } catch (error) {
+        res.status(500).json({ message: 'Error interno del servidor' });
+    }
+});
+
+// DELETE /api/posts/:id
+app.delete('/api/posts/:id', async (req, res) => {
+    try {
+        const post = await Post.findByIdAndDelete(req.params.id);
+        if (!post) return res.status(404).json({ message: 'Post no encontrado' });
+        res.status(204).send();
+    } catch (error) {
+        res.status(500).json({ message: 'Error interno del servidor' });
+    }
 });
 
 app.listen(8000, () => {
