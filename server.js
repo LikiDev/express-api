@@ -1,12 +1,24 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const employees = require('./data/employees.json');
+//entrega2
 const mongoose = require('mongoose');
 const Post = require('./models/post'); 
+//entrega3
+const User = require('../models/user');
+const bcrypt = require('bcrypt');
+
+const authenticate = require('./middlewares/authenticate');
+const postRoutes = require('./routes/posts');
 
 const app = express();
 
 app.use(express.json());
+
+
+app.use(authenticate);
+app.use('/api/posts', postRoutes);
+
 
 // 1. GET /api/employees devuelve todos los empleados
 app.get('/api/employees', (req, res) => {
@@ -82,11 +94,13 @@ app.get('/api/employees/:name', (req, res) => {
 // POST /api/posts
 app.post('/api/posts', async (req, res) => {
     try {
+        console.log(req.body);
         const post = new Post(req.body);
         await post.save();
         res.status(201).json(post);
     } catch (error) {
-        res.status(400).json({ message: 'Error en la validación' });
+        console.log('ESTOY AQUI');
+        res.status(400).json({ message: 'Error de la validación' });
     }
 });
 
