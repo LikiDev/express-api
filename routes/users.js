@@ -31,7 +31,7 @@ router.post('/api/users', async (req, res) => {
 
         // En un entorno real, aquí enviaríamos un correo electrónico al usuario con un enlace para confirmar su registro
         const token = jwt.sign({ userId: user._id }, 'SECRETO', { expiresIn: '1h' });
-        const confirmationLink = `http://localhost:3000/api/users/confirm/${token}`;
+        const confirmationLink = `http://localhost:8000/api/users/confirm/${token}`;
 
         console.log(`Link de confirmación: ${confirmationLink}`);
 
